@@ -26,8 +26,8 @@ public class ProductController {
 
     @GetMapping()
     @PreAuthorize("isAuthenticated()")
-    public List<ProductResponse> list() {
-        return productService.list();
+    public List<ProductResponse> list(@RequestParam(defaultValue = "") String q) {
+        return productService.list(q);
     }
 
     @PutMapping("/{id}")

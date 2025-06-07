@@ -11,6 +11,7 @@ import com.commerce.model.request.UpdateProductVariantRequest;
 import com.commerce.model.response.ProductResponse;
 import com.commerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -55,9 +56,12 @@ public class ProductService {
                 ).findFirst();
                 if(optionExistingVariant.isPresent()){
                     var existingVariant = optionExistingVariant.get();
+                    var existingSku = existingVariant.getSku();
                     existingVariant.setVariantName(requestVariant.getVariantName());
                     existingVariant.setQuantityPerUnit(requestVariant.getQuantityPerUnit());
                     existingVariant.setUnitType(requestVariant.getUnitType());
+                    existingSku.setPrice(requestVariant.getSku().getPrice());
+                    existingSku.setStockQuantity(requestVariant.getSku().getStockQuantity());
                 }
             } else {
                 ProductVariant newVariant = requestVariant.toEntity(product);
@@ -78,9 +82,21 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    public List<ProductResponse> list() {
-        return productRepository.findAll().stream().map(ProductResponse::from).collect(Collectors.toList());
+    public List<ProductResponse> list(String q) {
+        var spec = createSpecification(q);
+        return productRepository.findAll(spec).stream().map(ProductResponse::from).collect(Collectors.toList());
     }
 
+    Specification<Product> createSpecification(String q) {
+        return (root, query, criteriaBuilder) -> {
+            if (q == null || q.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("name"), "%" + q + "%"),
+                    criteriaBuilder.like(root.get("description"), "%" + q + "%")
+            );
+        };
+    }
 
 }

@@ -10,17 +10,25 @@ import type {ProductFormModel} from "@/models/product-form.ts"
 
 import {toast} from "sonner"
 import {type Column, DataTable} from "@/components/DataTable.tsx"
+import {Card} from "@/components/ui/card.tsx";
+import SearchInput from "@/components/SearchInput.tsx";
+import {usePageQuery} from "@/hooks/usePageQuery.ts";
+import parseError from "@/utils/error-utils.ts";
 
 
 export default function ProductsPage() {
     const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
     const [isFormModalOpen, setIsFormModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const {
+        searchText,
+        onSearchTextChange
+    } = usePageQuery("")
 
     const {error, data, isLoading, refetch} = useQuery({
-        queryKey: ["products"],
+        queryKey: ["products", searchText],
         queryFn: () =>
-            fetchProducts(),
+            fetchProducts(searchText),
     })
 
     const items = (data ?? []).map((x) => {
@@ -70,8 +78,9 @@ export default function ProductsPage() {
             setCurrentProduct(data)
             await refetch()
         },
-        onError: () => {
-            toast.error(currentProduct != null ? "Product updated failed" : "Product created failed")
+        onError: (error) => {
+            const errorMessage = parseError(error)
+            toast.error(errorMessage)
         },
     })
 
@@ -86,8 +95,9 @@ export default function ProductsPage() {
             setIsDeleteModalOpen(false)
             await refetch()
         },
-        onError: () => {
-            toast.error("Product delete failed")
+        onError: (error) => {
+            const errorMessage = parseError(error)
+            toast.error(errorMessage)
         },
     })
 
@@ -130,6 +140,9 @@ export default function ProductsPage() {
                     Add Product
                 </Button>
             </div>
+            <Card className="mb-4">
+                <SearchInput initialValue={searchText} onChange={onSearchTextChange}/>
+            </Card>
 
             {/* Products Table */}
             <DataTable

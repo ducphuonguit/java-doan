@@ -2,6 +2,7 @@ import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'a
 import { API_CONSTANTS } from '../constants/api';
 import {User} from "@/types";
 import LOCAL_STORAGE_KEY_CONSTANTS from "@/constants/local-storage-key.ts";
+import {isAppError} from "@/lib/error-utils.ts";
 
 interface ApiError {
     message: string;
@@ -77,7 +78,11 @@ axiosInstance.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }
+        console.log("error:",error);
 
+        if(isAppError(error)) {
+            return Promise.reject(error);
+        }
         const apiError: ApiError = {
             message: error.response?.data?.message || 'An error occurred',
             code: error.response?.status?.toString(),

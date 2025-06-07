@@ -2,6 +2,8 @@ package com.commerce.controller;
 
 import com.commerce.model.entity.RefreshToken;
 import com.commerce.model.entity.User;
+import com.commerce.model.exception.AppException;
+import com.commerce.model.exception.ErrorCode;
 import com.commerce.model.request.LoginRequest;
 import com.commerce.model.response.AuthResponse;
 import com.commerce.model.response.UserResponse;
@@ -13,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpResponse;
 
 @RequestMapping("/api/auth")
 @RestController
@@ -73,7 +78,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public AuthResponse refreshToken(@CookieValue(name = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
         if(refreshToken == null || refreshToken.isEmpty()) {
-            throw new RuntimeException("Refresh token is missing");
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS, null);
         }
 
         var storedRefreshToken = refreshTokenService.findById(refreshToken);

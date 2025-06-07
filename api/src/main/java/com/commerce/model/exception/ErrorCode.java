@@ -43,6 +43,11 @@ public enum ErrorCode {
             "Refresh token expired",
             HttpStatus.UNAUTHORIZED
     ),
+    ACCESS_DENIED(
+            "ACCESS_DENIED",
+            "Access denied",
+            HttpStatus.FORBIDDEN
+    ),
     INVALID_CREDENTIALS(
             "INVALID_CREDENTIALS",
             "Invalid credentials",

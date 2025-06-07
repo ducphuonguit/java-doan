@@ -162,7 +162,7 @@ export interface IntlString {
 
 export interface AppError {
     code: string;
-    message: IntlString
+    message: string
 }
 
 export interface OrderEntry {

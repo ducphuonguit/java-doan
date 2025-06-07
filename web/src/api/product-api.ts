@@ -4,15 +4,13 @@ import {ProductFormModel} from "@/models/product-form.ts";
 import {API_CONSTANTS} from "@/constants/api.ts";
 
 
-export async function fetchProducts() {
-    try {
-        const result = await axiosInstance.get<Product[]>(API_CONSTANTS.PRODUCT_ENDPOINT);
-        return result.data;
-    } catch (error) {
-        console.log(error)
-
-        throw error;
-    }
+export async function fetchProducts(q?: string | null) {
+    const result = await axiosInstance.get<Product[]>(API_CONSTANTS.PRODUCT_ENDPOINT, {
+        params: {
+            q
+        }
+    });
+    return result.data;
 }
 
 export async function addProduct(product: ProductFormModel) {
