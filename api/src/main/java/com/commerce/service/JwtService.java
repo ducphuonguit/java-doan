@@ -28,7 +28,7 @@ public class JwtService {
     private long refreshExpiration;
 
     public long getRefreshExpiration() {
-        return refreshExpiration * 86400000L;
+        return refreshExpiration * 1000L;
     }
 
     public long getTokenExpiration() {

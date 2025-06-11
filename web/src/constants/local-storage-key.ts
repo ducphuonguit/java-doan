@@ -1,5 +1,5 @@
 const LOCAL_STORAGE_KEY_CONSTANTS = {
-    ACCESS_TOKEN: 'admin-access-token',
+    ACCESS_TOKEN: 'access_token',
     USER: 'user',
 }
 

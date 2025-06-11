@@ -48,6 +48,8 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     async (error) => {
+        console.error("api request error: ",error);
+
         const originalRequest = error.config;
         // Check for unauthenticated response (401 status)
         if (
@@ -73,12 +75,12 @@ axiosInstance.interceptors.response.use(
                 // Retry original request
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 return Promise.reject(refreshError);
             }
         }
-        console.log("error:",error);
 
         if(isAppError(error)) {
             return Promise.reject(error);

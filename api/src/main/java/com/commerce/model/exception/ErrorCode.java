@@ -48,6 +48,16 @@ public enum ErrorCode {
             "Access denied",
             HttpStatus.FORBIDDEN
     ),
+    USERNAME_ALREADY_EXISTS(
+            "USERNAME_ALREADY_EXISTS",
+            "Username {username} already exists",
+            HttpStatus.BAD_REQUEST
+    ),
+    USERNAME_NOT_FOUND(
+            "USERNAME_NOT_FOUND",
+            "Username {username} not found",
+            HttpStatus.NOT_FOUND
+    ),
     INVALID_CREDENTIALS(
             "INVALID_CREDENTIALS",
             "Invalid credentials",

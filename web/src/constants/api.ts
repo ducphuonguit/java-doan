@@ -9,5 +9,6 @@ export const API_CONSTANTS = {
         LOGIN: '/auth/login',
         LOGOUT: '/auth/logout',
         REFRESH: '/auth/refresh-token',
+        SIGNUP: '/auth/signup',
     }
 };

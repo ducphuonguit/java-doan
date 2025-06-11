@@ -40,22 +40,29 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> {
-                    ex.authenticationEntryPoint((request, response, authException) ->
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + authException.getMessage())
-                    );
-                    ex.accessDeniedHandler((request, response, accessDeniedException) -> {
-                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                        boolean isAnonymous = authentication == null ||
-                                authentication instanceof AnonymousAuthenticationToken ||
-                                !authentication.isAuthenticated();
+                    ex.authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("""
+                            {
+                                "errorCode": "ACCESS_DENIED",
+                                "message": null
+                            }
+                        """);
+                                    });
 
-                        if (isAnonymous) {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized (not logged in)");
-                        } else {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden (no permission)");
-                        }
+                                    ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+                                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                        response.setContentType("application/json");
+                                        response.getWriter().write("""
+                            {
+                                "errorCode": "ACCESS_DENIED",
+                                "message": null
+                            }
+                        """);
                     });
                 });
+
 
         return http.build();
     }

@@ -2,9 +2,11 @@ package com.commerce.model.exception;
 
 
 import com.commerce.util.PlaceholderUtil;
+import lombok.Data;
 
 import java.util.Map;
 
+@Data
 public class ErrorDTO {
     private final String code;
     private final String message;

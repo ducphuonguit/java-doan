@@ -2,10 +2,13 @@ package com.commerce.model.exception;
 
 
 import com.commerce.util.PlaceholderUtil;
+import lombok.Getter;
 
 import java.util.Map;
 
+@Getter
 public class AppException extends RuntimeException {
+    // Getters
     private final ErrorCode errorCode;
     private final Map<String, String> messageParams;
 
@@ -23,12 +26,4 @@ public class AppException extends RuntimeException {
         return errorCode.getMessageEn();
     }
 
-    // Getters
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
-
-    public Map<String, String> getMessageParams() {
-        return messageParams;
-    }
 }

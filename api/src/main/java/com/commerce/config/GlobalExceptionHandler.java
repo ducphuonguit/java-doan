@@ -5,7 +5,6 @@ import com.commerce.model.exception.AppException;
 import com.commerce.model.exception.ErrorCode;
 import com.commerce.model.exception.ErrorDTO;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,7 +19,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDTO> handleAppException(AppException e) {
         ErrorDTO errorDTO = new ErrorDTO(e.getErrorCode(), e.getMessageParams());
         HttpStatusCode httpStatus = e.getErrorCode().getHttpStatus();
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorDTO);
+        return new ResponseEntity<>(errorDTO, httpStatus);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

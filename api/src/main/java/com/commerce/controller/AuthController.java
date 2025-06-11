@@ -5,6 +5,7 @@ import com.commerce.model.entity.User;
 import com.commerce.model.exception.AppException;
 import com.commerce.model.exception.ErrorCode;
 import com.commerce.model.request.LoginRequest;
+import com.commerce.model.request.SignUpRequest;
 import com.commerce.model.response.AuthResponse;
 import com.commerce.model.response.UserResponse;
 import com.commerce.service.AuthService;
@@ -15,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.http.HttpResponse;
 
 @RequestMapping("/api/auth")
 @RestController
@@ -102,4 +100,35 @@ public class AuthController {
                 .user(UserResponse.from(user))
                 .build();
     }
+
+    @PostMapping("/signup")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse signUp(@RequestBody SignUpRequest request, HttpServletResponse response) {
+        User user = authService.register(request);
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        refreshTokenService.save(
+                RefreshToken.builder()
+                        .token(refreshToken)
+                        .user(user)
+                        .expirationTime(jwtService.extractExpirationInstant(refreshToken))
+                        .build()
+        );
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")
+                .maxAge(jwtService.getRefreshExpiration()/1000)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return AuthResponse.builder()
+                .accessToken(jwtToken)
+                .user(UserResponse.from(user))
+                .build();
+    }
 }
+

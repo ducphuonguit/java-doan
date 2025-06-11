@@ -15,6 +15,7 @@ import "./index.css"
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {Toaster} from "sonner";
 import QueryStateContextProvider from "@/context/query-state/QueryStateProvider.tsx";
+import SignupPage from "@/pages/SignupPage.tsx";
 
 export const queryClient = new QueryClient({
     defaultOptions: {
@@ -44,7 +45,10 @@ const router = createBrowserRouter([
                 path: "/login",
                 element: <LoginPage/>,
             },
-
+            {
+                path:"/signup",
+                element: <SignupPage/>,
+            },
             {
                 path: "/",
                 // element: <ProtectedRoute/>,

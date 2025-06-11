@@ -1,7 +1,6 @@
 import {AppError} from "@/types";
 
 export default function parseError(error: unknown){
-    console.log("error:",error);
     if(isAppError(error)){
         return error.message
     }

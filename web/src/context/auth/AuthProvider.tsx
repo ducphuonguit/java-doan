@@ -1,6 +1,5 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { AuthContext } from "@/context/auth/AuthContext.ts";
-import {AxiosError} from "axios";
+import {useState, useEffect, type ReactNode} from "react";
+import {AuthContext} from "@/context/auth/AuthContext.ts";
 import axiosInstance, {authAxiosInstance} from "@/api/axios-instance.ts";
 import {User} from "@/types";
 import LOCAL_STORAGE_KEY_CONSTANTS from "@/constants/local-storage-key.ts";
@@ -11,7 +10,7 @@ interface AuthResponse {
     user: User;
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({children}: { children: ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -29,29 +28,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (username: string, password: string): Promise<boolean> => {
-        try {
-            const response = await authAxiosInstance.post<AuthResponse>(API_CONSTANTS.AUTH_ENDPOINT.LOGIN, {
-                username,
-                password,
-            });
-            const { accessToken, user } = response.data;
+        const response = await authAxiosInstance.post<AuthResponse>(API_CONSTANTS.AUTH_ENDPOINT.LOGIN, {
+            username,
+            password,
+        });
+        const {accessToken, user} = response.data;
 
-            localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.ACCESS_TOKEN, accessToken);
-            localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.USER, JSON.stringify(user));
+        localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.ACCESS_TOKEN, accessToken);
+        localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.USER, JSON.stringify(user));
 
-            setIsAuthenticated(true);
-            setUser(user);
-            return true;
-        } catch (error: unknown) {
-
-            if(error instanceof AxiosError){
-                console.error("Login failed:", error.message);
-            }else{
-                console.error("Login failed:", error);
-            }
-            return false;
-
-        }
+        setIsAuthenticated(true);
+        setUser(user);
+        return true;
     };
 
     const logout = async () => {
@@ -68,12 +56,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const signup = async (username: string, password: string): Promise<boolean> => {
+        // Optional: Call logout endpoint if your API supports it
+        const response = await axiosInstance.post<AuthResponse>(API_CONSTANTS.AUTH_ENDPOINT.SIGNUP, {
+            username,
+            password,
+        });
+        const {accessToken, user} = response.data;
+
+        localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.ACCESS_TOKEN, accessToken);
+        localStorage.setItem(LOCAL_STORAGE_KEY_CONSTANTS.USER, JSON.stringify(user));
+
+        setIsAuthenticated(true);
+        setUser(user);
+
+        return true;
+
+    }
+
     if (loading) {
         return <div>Loading...</div>;
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+        <AuthContext.Provider value={{isAuthenticated, user, login, logout, signup}}>
             {children}
         </AuthContext.Provider>
     );

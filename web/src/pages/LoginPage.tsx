@@ -5,6 +5,9 @@ import {useAuth} from "@/hooks/useAuth.ts";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {AxiosError} from "axios";
+import parseError from "@/utils/error-utils.ts";
+import {toast} from "sonner";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -29,8 +32,12 @@ export default function LoginPage() {
         setError("Invalid username or password")
       }
     } catch (err) {
-      setError("An error occurred during login")
-      console.error(err)
+      if(err instanceof AxiosError){
+        const errorMessage = parseError(err.response?.data);
+        toast.error(errorMessage)
+        return;
+      }
+      toast.error("Invalid username or password")
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +80,7 @@ export default function LoginPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-2 top-[32px] h-8 w-8"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
                   </Button>
 
                 </div>
@@ -82,6 +89,17 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" variant="default" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
+              <div className="mt-4 text-center text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Button
+                    variant="link"
+                    className="p-0 h-auto font-normal text-blue-600 hover:text-blue-800"
+                    type="button"
+                    onClick={() => navigate("/signup")}
+                >
+                  Sign up here
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
