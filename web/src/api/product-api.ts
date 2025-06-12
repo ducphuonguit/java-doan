@@ -7,7 +7,7 @@ import {API_CONSTANTS} from "@/constants/api.ts";
 export async function fetchProducts(q?: string | null) {
     const result = await axiosInstance.get<Product[]>(API_CONSTANTS.PRODUCT_ENDPOINT, {
         params: {
-            q
+            q: q || undefined
         }
     });
     return result.data;
